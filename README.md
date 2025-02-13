@@ -32,7 +32,7 @@ Docker Compose allows you to define and run multi-container Docker applications.
 3. Replace & configure the placeholder values in the `docker-compose.yml`, `docker.env` and `nocodb/db.json` files.
 
 > [!TIP]
-> You can use a text editor to search and replace the placeholder values in the files.
+> You can use a text editor to search and replace the placeholder values in the files. \
 > List of placeholder values to replace:
 >
 > - {{PLACEHOLDER_NC_LICENSE_KEY}}
