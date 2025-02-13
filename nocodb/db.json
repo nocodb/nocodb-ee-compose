@@ -1,0 +1,10 @@
+{
+  "client": "pg",
+  "connection": {
+    "host": "db",
+    "port": "5432",
+    "user": "{{PLACEHOLDER_PG_USER}}",
+    "password": "{{PLACEHOLDER_PG_PASSWORD}}",
+    "database": "nocodb"
+  }
+}

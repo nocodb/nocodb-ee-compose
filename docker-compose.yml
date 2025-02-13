@@ -1,0 +1,140 @@
+services:
+  nocodb:
+    image: nocodb/nocodb-ee:latest
+    env_file: docker.env
+    deploy:
+      mode: replicated
+      replicas: 1
+    depends_on:
+      - db
+      - redis
+      - minio
+    restart: unless-stopped
+    volumes:
+      - ./nocodb:/usr/app/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "traefik.enable=true"
+      - "traefik.http.routers.nocodb.rule=Host(`{{PLACEHOLDER_NOCODB_DOMAIN}}`)"
+      - "traefik.http.routers.nocodb.entrypoints=websecure"
+      - "traefik.http.routers.nocodb.tls=true"
+      - "traefik.http.routers.nocodb.tls.certresolver=letsencrypt"
+    networks:
+      - nocodb-network
+  worker:
+    image: nocodb/nocodb-ee:latest
+    env_file: docker.env
+    environment:
+      - NC_WORKER_CONTAINER=true
+    networks:
+      - nocodb-network
+    depends_on:
+      - nocodb
+    restart: unless-stopped
+    volumes:
+      - ./nocodb:/usr/app/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  traefik:
+    image: traefik:v3.1
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.minio.address=:9000"
+      - "--entrypoints.minio-console.address=:9001"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.letsencrypt.acme.email=contact@{{PLACEHOLDER_NOCODB_DOMAIN}}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/etc/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - nocodb-network
+
+  db:
+    image: postgres:16.6
+    environment:
+      POSTGRES_USER: "{{PLACEHOLDER_PG_USER}}"
+      POSTGRES_PASSWORD: "{{PLACEHOLDER_PG_PASSWORD}}"
+      POSTGRES_DB: postgres
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - nocodb-network
+
+  redis:
+    image: redis:latest
+    restart: unless-stopped
+    command:
+      - /bin/sh
+      - -c
+      - redis-server
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    volumes:
+      - ./redis:/data
+    networks:
+      - nocodb-network
+    
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    volumes:
+      - ./minio:/export
+    command: -c "mkdir -p /export/nocodb && /usr/bin/minio server /export --console-address \":9001\""
+    environment:
+      - MINIO_ROOT_USER=nc_minio_user
+      - MINIO_ROOT_PASSWORD={{PLACEHOLDER_MINIO_ROOT_PASSWORD}}
+      - MINIO_BROWSER_REDIRECT_URL=https://{{PLACEHOLDER_MINIO_DOMAIN}}/minio/ui/
+      - MINIO_SERVER_URL=https://{{PLACEHOLDER_MINIO_DOMAIN}}
+    labels:
+      # Main MinIO Service (Port 9000)
+      - "traefik.enable=true"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+      - "traefik.http.routers.minio.rule=Host(`{{PLACEHOLDER_MINIO_DOMAIN}}`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.tls=true"
+      - "traefik.http.routers.minio.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.minio.service=minio"
+      # MinIO Console Service (Port 9001)
+      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+      - "traefik.http.routers.minio-console.rule=Host(`{{PLACEHOLDER_MINIO_DOMAIN}}`) && PathPrefix(`/minio/ui`)"
+      - "traefik.http.middlewares.minio-console-stripprefixregex.stripprefixregex.regex=^/minio/ui"
+      - "traefik.http.routers.minio-console.middlewares=minio-console-stripprefixregex"
+      - "traefik.http.routers.minio-console.entrypoints=websecure"
+      - "traefik.http.routers.minio-console.tls=true"
+      - "traefik.http.routers.minio-console.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.minio-console.service=minio-console" 
+    networks:
+      - nocodb-network
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --schedule "0 2 * * 6" --cleanup
+    restart: unless-stopped
+    networks:
+      - nocodb-network
+
+volumes:
+    redis:
+networks:
+  nocodb-network:
+    driver: bridge
