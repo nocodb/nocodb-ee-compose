@@ -16,12 +16,11 @@ Docker Compose allows you to define and run multi-container Docker applications.
     ```
 
 > [!TIP]
-> If you are using the template files, download them to a directory on your host machine.
-> Structure the directory as follows:
-> directory
-> ├── docker-compose.yml
-> ├── docker.env
-> ├── nocodb
+> If you are using the template files, download them to a directory on your host machine. \
+> Structure the directory as following: \
+> ├── docker-compose.yml \
+> ├── docker.env \
+> ├── nocodb \
 > ........└── db.json
 
 2. Navigate to the cloned directory:
