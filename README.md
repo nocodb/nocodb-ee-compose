@@ -37,8 +37,6 @@ Docker Compose allows you to define and run multi-container Docker applications.
 >
 > - {{PLACEHOLDER_NC_LICENSE_KEY}}
 > - {{PLACEHOLDER_NOCODB_DOMAIN}}
-> - {{PLACEHOLDER_MINIO_DOMAIN}}
-> - {{PLACEHOLDER_MINIO_ROOT_PASSWORD}}
 > - {{PLACEHOLDER_PG_USER}}
 > - {{PLACEHOLDER_PG_PASSWORD}}
 
@@ -48,7 +46,7 @@ Docker Compose allows you to define and run multi-container Docker applications.
     docker-compose up -d
     ```
 
-    This will start NocoDB along with a PostgreSQL database, MinIO, and Redis.
+    This will start NocoDB along with a PostgreSQL database, and Redis.
 
 5. Access NocoDB in your browser by visiting `https://your-domain.tld`.
 

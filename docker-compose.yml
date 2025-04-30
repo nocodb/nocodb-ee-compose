@@ -8,7 +8,6 @@ services:
     depends_on:
       - db
       - redis
-      - minio
     restart: unless-stopped
     volumes:
       - ./nocodb:/usr/app/data
@@ -44,8 +43,6 @@ services:
       - "--entrypoints.web.address=:80"
       - "--providers.docker.exposedByDefault=false"
       - "--entrypoints.websecure.address=:443"
-      - "--entrypoints.minio.address=:9000"
-      - "--entrypoints.minio-console.address=:9001"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
       - "--certificatesresolvers.letsencrypt.acme.email=contact@{{PLACEHOLDER_NOCODB_DOMAIN}}"
@@ -88,39 +85,6 @@ services:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     volumes:
       - ./redis:/data
-    networks:
-      - nocodb-network
-    
-  minio:
-    image: minio/minio:latest
-    restart: unless-stopped
-    entrypoint: /bin/sh
-    volumes:
-      - ./minio:/export
-    command: -c "mkdir -p /export/nocodb && /usr/bin/minio server /export --console-address \":9001\""
-    environment:
-      - MINIO_ROOT_USER=nc_minio_user
-      - MINIO_ROOT_PASSWORD={{PLACEHOLDER_MINIO_ROOT_PASSWORD}}
-      - MINIO_BROWSER_REDIRECT_URL=https://{{PLACEHOLDER_MINIO_DOMAIN}}/minio/ui/
-      - MINIO_SERVER_URL=https://{{PLACEHOLDER_MINIO_DOMAIN}}
-    labels:
-      # Main MinIO Service (Port 9000)
-      - "traefik.enable=true"
-      - "traefik.http.services.minio.loadbalancer.server.port=9000"
-      - "traefik.http.routers.minio.rule=Host(`{{PLACEHOLDER_MINIO_DOMAIN}}`)"
-      - "traefik.http.routers.minio.entrypoints=websecure"
-      - "traefik.http.routers.minio.tls=true"
-      - "traefik.http.routers.minio.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.minio.service=minio"
-      # MinIO Console Service (Port 9001)
-      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-      - "traefik.http.routers.minio-console.rule=Host(`{{PLACEHOLDER_MINIO_DOMAIN}}`) && PathPrefix(`/minio/ui`)"
-      - "traefik.http.middlewares.minio-console-stripprefixregex.stripprefixregex.regex=^/minio/ui"
-      - "traefik.http.routers.minio-console.middlewares=minio-console-stripprefixregex"
-      - "traefik.http.routers.minio-console.entrypoints=websecure"
-      - "traefik.http.routers.minio-console.tls=true"
-      - "traefik.http.routers.minio-console.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.minio-console.service=minio-console" 
     networks:
       - nocodb-network
 
