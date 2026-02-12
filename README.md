@@ -7,6 +7,19 @@ Docker Compose allows you to define and run multi-container Docker applications.
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 
+## Network Requirements
+
+NocoDB Enterprise requires outbound network access to the NocoDB license server for license validation and periodic license checks. Ensure the following endpoint is whitelisted in your firewall, proxy, or network security policies:
+
+| Endpoint | Protocol | Purpose |
+|---|---|---|
+| `https://app.nocodb.com/api/v1/on-premise/agent` | HTTPS (TCP 443) | License activation, validation, and periodic renewal |
+
+> [!IMPORTANT]
+> If this endpoint is not reachable from your NocoDB instance, license operations will fail and the application may not start or may lose access to enterprise features.
+
+If your environment routes outbound traffic through a proxy, ensure the proxy allows HTTPS traffic to `app.nocodb.com` as well.
+
 ## Installation Steps
 
 1. Clone the NocoDB repository from GitHub or get the template files from the links below [Template Files](#template-files).
@@ -71,3 +84,4 @@ Docker Compose allows you to define and run multi-container Docker applications.
     ```
   
 - Ensure all required ports are available on your host machine (80, 443)
+- If you encounter license-related errors, verify that your server can reach `https://app.nocodb.com/api/v1/on-premise/agent` (see [Network Requirements](#network-requirements))
