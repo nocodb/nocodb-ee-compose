@@ -1,87 +1,77 @@
-# Installing NocoDB Enterprise with Docker Compose
+# NocoDB Enterprise Edition — Docker Compose
 
-Docker Compose allows you to define and run multi-container Docker applications. It's a great way to set up NocoDB along with all resources in a single configuration file.
+Deploy NocoDB Enterprise with Docker Compose. The interactive setup wizard configures your stack based on your infrastructure.
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+- Docker Engine 24+ with Compose V2
+- NocoDB Enterprise license key
+- A domain with DNS pointing to your server (if using built-in Traefik)
+
+## Quick Start
+
+```bash
+git clone https://github.com/nocodb/nocodb-ee-compose.git
+cd nocodb-ee-compose
+./setup.sh
+docker compose up -d
+```
+
+The setup wizard asks you to configure:
+
+| Component | Options |
+|-----------|---------|
+| **PostgreSQL** | Bundled (demo only) or External with SSL support (RDS, Azure, Cloud SQL, custom CA) |
+| **Redis** | Bundled or External |
+| **Reverse Proxy** | Bundled Traefik with automatic HTTPS (Let's Encrypt), or BYO (exposes port 8080) |
+
+## Updating
+
+```bash
+./update.sh
+```
+
+Pulls the latest images and restarts services.
 
 ## Network Requirements
 
-NocoDB Enterprise requires outbound network access to the NocoDB license server for license validation and periodic license checks. Ensure the following endpoint is whitelisted in your firewall, proxy, or network security policies:
+NocoDB Enterprise requires outbound HTTPS to the license server:
 
 | Endpoint | Protocol | Purpose |
-|---|---|---|
-| `https://app.nocodb.com/api/v1/on-premise/agent` | HTTPS (TCP 443) | License activation, validation, and periodic renewal |
+|----------|----------|---------|
+| `https://app.nocodb.com/api/v1/on-premise/agent` | HTTPS (TCP 443) | License activation, validation, and renewal |
 
-> [!IMPORTANT]
-> If this endpoint is not reachable from your NocoDB instance, license operations will fail and the application may not start or may lose access to enterprise features.
+> **Important:** If this endpoint is not reachable, license operations will fail and enterprise features become unavailable. If your environment routes outbound traffic through a proxy, ensure it allows HTTPS traffic to `app.nocodb.com`.
 
-If your environment routes outbound traffic through a proxy, ensure the proxy allows HTTPS traffic to `app.nocodb.com` as well.
+## Generated Files
 
-## Installation Steps
+`setup.sh` creates these files (gitignored — they contain credentials):
 
-1. Clone the NocoDB repository from GitHub or get the template files from the links below [Template Files](#template-files).
+| File | Purpose |
+|------|---------|
+| `docker-compose.yml` | Service orchestration |
+| `docker.env` | Environment variables (license key, Redis URL) |
+| `nocodb/db.json` | Database connection config (host, credentials, SSL) |
 
-    ```bash
-    git clone https://github.com/nocodb/nocodb-ee-compose
-    ```
+## Reconfiguration
 
-> [!TIP]
-> If you are using the template files, download them to a directory on your host machine. \
-> Structure the directory as following: \
-> ├── docker-compose.yml \
-> ├── docker.env \
-> ├── nocodb \
-> ........└── db.json
+Run `./setup.sh` again to regenerate all configuration files:
 
-2. Navigate to the cloned directory:
-
-    ```bash
-    cd nocodb-ee-compose
-    ```
-
-3. Replace & configure the placeholder values in the `docker-compose.yml`, `docker.env` and `nocodb/db.json` files.
-
-> [!TIP]
-> You can use a text editor to search and replace the placeholder values in the files. \
-> List of placeholder values to replace:
->
-> - {{PLACEHOLDER_NC_LICENSE_KEY}}
-> - {{PLACEHOLDER_NOCODB_DOMAIN}}
-> - {{PLACEHOLDER_PG_USER}}
-> - {{PLACEHOLDER_PG_PASSWORD}}
-
-4. Start the services using Docker Compose:
-
-    ```bash
-    docker-compose up -d
-    ```
-
-    This will start NocoDB along with a PostgreSQL database, and Redis.
-
-5. Access NocoDB in your browser by visiting `https://your-domain.tld`.
-
-## Template Files
-
-- `docker-compose.yml` - The main Docker Compose configuration file ([get](https://raw.githubusercontent.com/nocodb/nocodb-ee-compose/refs/heads/main/docker-compose.yml)).
-- `docker.env` - Environment variables for the NocoDB service ([get](https://raw.githubusercontent.com/nocodb/nocodb-ee-compose/refs/heads/main/docker.env)).
-- `db.json` - Database configuration file for NocoDB ([get](https://raw.githubusercontent.com/nocodb/nocodb-ee-compose/refs/heads/main/nocodb/db.json)).
+```bash
+docker compose down
+./setup.sh
+docker compose up -d
+```
 
 ## Troubleshooting
 
-- If you encounter any issues, check the logs using the following command:
+```bash
+# View logs
+docker compose logs -f nocodb
 
-    ```bash
-    docker-compose logs
-    ```
-  
-- If you need to stop the services, use the following command:
+# Check service status
+docker compose ps
 
-    ```bash
-    docker-compose down
-    ```
-  
-- Ensure all required ports are available on your host machine (80, 443)
-- If you encounter license-related errors, verify that your server can reach `https://app.nocodb.com/api/v1/on-premise/agent` (see [Network Requirements](#network-requirements))
+# Stop all services
+docker compose down
+```
