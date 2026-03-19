@@ -1,0 +1,10 @@
+{
+  "client": "pg",
+  "connection": {
+    "host": "db",
+    "port": "5432",
+    "user": "nocodb",
+    "password": "CHANGE_ME_generated_password",
+    "database": "nocodb"
+  }
+}

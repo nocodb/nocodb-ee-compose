@@ -1,0 +1,14 @@
+{
+  "client": "pg",
+  "connection": {
+    "host": "your-db-host.internal",
+    "port": "5432",
+    "user": "nocodb",
+    "password": "YOUR_DATABASE_PASSWORD",
+    "database": "nocodb",
+    "ssl": {
+      "rejectUnauthorized": true,
+      "ca": "-----BEGIN CERTIFICATE-----\nPASTE_YOUR_CA_CERTIFICATE_CONTENT_HERE\n-----END CERTIFICATE-----"
+    }
+  }
+}

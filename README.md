@@ -25,6 +25,16 @@ The setup wizard asks you to configure:
 | **Redis** | Bundled or External |
 | **Reverse Proxy** | Bundled Traefik with automatic HTTPS (Let's Encrypt), or BYO (exposes port 8080) |
 
+## Examples
+
+See [`examples/`](examples/) for pre-built configurations covering common scenarios:
+
+- **[quickstart-demo](examples/quickstart-demo/)** — Bundled PostgreSQL + Redis, no proxy (demo/evaluation)
+- **[managed-postgres](examples/managed-postgres/)** — External managed database with SSL + bundled Redis
+- **[external-postgres-and-redis](examples/external-postgres-and-redis/)** — External PostgreSQL + Redis, minimal Docker footprint
+- **[traefik-custom-ssl](examples/traefik-custom-ssl/)** — Fully external + Traefik with custom SSL certificate
+- **[postgres-private-ca](examples/postgres-private-ca/)** — External database with private CA + Traefik HTTPS
+
 ## Updating
 
 ```bash
