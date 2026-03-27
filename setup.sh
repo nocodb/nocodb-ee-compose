@@ -18,7 +18,6 @@ NC='\033[0m'
 
 # ── State ─────────────────────────────────────────────────────────────────────
 
-LICENSE_KEY=""
 PG_MODE=""       # bundled | external
 PG_HOST="db"
 PG_PORT="5432"
@@ -113,13 +112,6 @@ check_existing() {
 }
 
 # ── Collectors ────────────────────────────────────────────────────────────────
-
-collect_license() {
-  header "License"
-  ask "License key"
-  LICENSE_KEY="$REPLY"
-  [ -n "$LICENSE_KEY" ] || fail "License key is required"
-}
 
 collect_pg() {
   header "PostgreSQL"
@@ -279,9 +271,6 @@ EOF
 
 generate_env() {
   cat > "$SCRIPT_DIR/docker.env" <<EOF
-# NocoDB Enterprise
-NC_LICENSE_KEY=${LICENSE_KEY}
-
 # Database
 NC_DB_JSON_FILE=/usr/app/data/db.json
 
@@ -432,7 +421,6 @@ main() {
   check_prereqs
   check_existing
 
-  collect_license
   collect_pg
   collect_redis
   collect_proxy
@@ -454,6 +442,9 @@ main() {
   echo "  Next steps:"
   printf '    %b$%b docker compose up -d\n' "$DIM" "$NC"
   printf '    %b$%b docker compose logs -f nocodb\n' "$DIM" "$NC"
+  echo ""
+  printf '  %bActivate your license in the Admin Panel:%b\n' "$BOLD" "$NC"
+  printf '    Open NocoDB → Admin Panel → License → paste your key\n'
   echo ""
 }
 

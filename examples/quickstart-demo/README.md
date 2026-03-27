@@ -11,7 +11,6 @@ The simplest configuration for demo and evaluation. Everything runs locally in D
 ```bash
 cp -r examples/quickstart-demo ./my-deployment
 cd my-deployment
-# Edit docker.env — set NC_LICENSE_KEY
 # Edit nocodb/db.json — change the password
 # Update POSTGRES_PASSWORD in docker-compose.yml to match
 docker compose up -d

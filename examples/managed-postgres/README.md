@@ -11,7 +11,7 @@ Production-ready configuration using an external managed PostgreSQL database (e.
 ```bash
 cp -r examples/managed-postgres ./my-deployment
 cd my-deployment
-# Edit docker.env — set NC_LICENSE_KEY and NC_REDIS_URL
+# Edit docker.env — set NC_REDIS_URL
 # Edit nocodb/db.json — set your database host, credentials, and port
 docker compose up -d
 ```

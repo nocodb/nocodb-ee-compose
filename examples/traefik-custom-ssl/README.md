@@ -17,7 +17,7 @@ mkdir -p certs
 cp /path/to/cert.pem certs/cert.pem
 cp /path/to/key.pem certs/key.pem
 
-# Edit docker.env — set NC_LICENSE_KEY and NC_REDIS_URL
+# Edit docker.env — set NC_REDIS_URL
 # Edit nocodb/db.json — set your database host and credentials
 # Edit docker-compose.yml — replace nocodb.example.com with your domain
 docker compose up -d

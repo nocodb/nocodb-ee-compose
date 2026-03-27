@@ -11,7 +11,7 @@ Minimal Docker footprint — only NocoDB containers. All backing services are ma
 ```bash
 cp -r examples/external-postgres-and-redis ./my-deployment
 cd my-deployment
-# Edit docker.env — set NC_LICENSE_KEY and NC_REDIS_URL
+# Edit docker.env — set NC_REDIS_URL
 # Edit nocodb/db.json — set your database host, credentials, and port
 docker compose up -d
 ```

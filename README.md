@@ -5,7 +5,6 @@ Deploy NocoDB Enterprise with Docker Compose. The interactive setup wizard confi
 ## Prerequisites
 
 - Docker Engine 24+ with Compose V2
-- NocoDB Enterprise license key
 - A domain with DNS pointing to your server (if using built-in Traefik)
 
 ## Quick Start
@@ -16,6 +15,8 @@ cd nocodb-ee-compose
 ./setup.sh
 docker compose up -d
 ```
+
+Once NocoDB is running, activate your license: open **Admin Panel** > **License** and paste your key.
 
 The setup wizard asks you to configure:
 
@@ -60,7 +61,7 @@ NocoDB Enterprise requires outbound HTTPS to the license server:
 | File | Purpose |
 |------|---------|
 | `docker-compose.yml` | Service orchestration |
-| `docker.env` | Environment variables (license key, Redis URL) |
+| `docker.env` | Environment variables (Redis URL, settings) |
 | `nocodb/db.json` | Database connection config (host, credentials, SSL) |
 
 ## Reconfiguration
