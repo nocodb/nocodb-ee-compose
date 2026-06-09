@@ -1,88 +1,16 @@
-# NocoDB Enterprise Edition — Docker Compose
+# nocodb-ee-compose (deprecated)
 
-Deploy NocoDB Enterprise with Docker Compose. The interactive setup wizard configures your stack based on your infrastructure.
+> **This repository is deprecated.** NocoDB now ships a single Docker image (`nocodb/nocodb:latest`) containing both Community and Enterprise code; a license key activates Enterprise features at runtime. All Docker Compose installation content has moved to the main [`nocodb/nocodb`](https://github.com/nocodb/nocodb) repository and the [self-hosting documentation](https://nocodb.com/docs/self-hosting).
 
-## Prerequisites
+## Where everything moved
 
-- Docker Engine 24+ with Compose V2
-- A domain with DNS pointing to your server (if using built-in Traefik)
+| Used to live here | Now lives at |
+|---|---|
+| The `setup.sh` install wizard | [Quickstart](https://nocodb.com/docs/self-hosting/installation/quickstart) and [Single-server install](https://nocodb.com/docs/self-hosting/installation/single-server) (installer hosted at `https://install.nocodb.com/noco.sh`) |
+| The `examples/` directory (managed Postgres, Traefik custom SSL, etc.) | [Custom infrastructure](https://nocodb.com/docs/self-hosting/installation/custom-infrastructure) and [`docker-compose/examples/`](https://github.com/nocodb/nocodb/tree/develop/docker-compose/examples) |
+| Upgrading and backups | [Self-hosting docs](https://nocodb.com/docs/self-hosting) |
+| License purchase, activation (standard, airgapped, offline), and egress requirements | [Purchasing a license](https://nocodb.com/docs/self-hosting/purchase-license) and [Activating a license](https://nocodb.com/docs/self-hosting/license-activation) |
 
-## Quick Start
+## Existing installations
 
-```bash
-git clone https://github.com/nocodb/nocodb-ee-compose.git
-cd nocodb-ee-compose
-./setup.sh
-docker compose up -d
-```
-
-Once NocoDB is running, activate your license: open **Admin Panel** > **License** and paste your key.
-
-The setup wizard asks you to configure:
-
-| Component | Options |
-|-----------|---------|
-| **PostgreSQL** | Bundled (demo only) or External with SSL support (RDS, Azure, Cloud SQL, custom CA) |
-| **Redis** | Bundled or External |
-| **Reverse Proxy** | Bundled Traefik with automatic HTTPS (Let's Encrypt), or BYO (exposes port 8080) |
-
-## Examples
-
-See [`examples/`](examples/) for pre-built configurations covering common scenarios:
-
-- **[quickstart-demo](examples/quickstart-demo/)** — Bundled PostgreSQL + Redis, no proxy (demo/evaluation)
-- **[managed-postgres](examples/managed-postgres/)** — External managed database with SSL + bundled Redis
-- **[external-postgres-and-redis](examples/external-postgres-and-redis/)** — External PostgreSQL + Redis, minimal Docker footprint
-- **[traefik-custom-ssl](examples/traefik-custom-ssl/)** — Fully external + Traefik with custom SSL certificate
-- **[postgres-private-ca](examples/postgres-private-ca/)** — External database with private CA + Traefik HTTPS
-
-## Updating
-
-```bash
-./update.sh
-```
-
-Pulls the latest images and restarts services.
-
-## Network Requirements
-
-NocoDB Enterprise requires outbound HTTPS to the license server:
-
-| Endpoint | Protocol | Purpose |
-|----------|----------|---------|
-| `https://app.nocodb.com/api/v1/on-premise/agent` | HTTPS (TCP 443) | License activation, validation, and renewal |
-
-> **Important:** If this endpoint is not reachable, license operations will fail and enterprise features become unavailable. If your environment routes outbound traffic through a proxy, ensure it allows HTTPS traffic to `app.nocodb.com`.
-
-## Generated Files
-
-`setup.sh` creates these files (gitignored — they contain credentials):
-
-| File | Purpose |
-|------|---------|
-| `docker-compose.yml` | Service orchestration |
-| `docker.env` | Environment variables (Redis URL, settings) |
-| `nocodb/db.json` | Database connection config (host, credentials, SSL) |
-
-## Reconfiguration
-
-Run `./setup.sh` again to regenerate all configuration files:
-
-```bash
-docker compose down
-./setup.sh
-docker compose up -d
-```
-
-## Troubleshooting
-
-```bash
-# View logs
-docker compose logs -f nocodb
-
-# Check service status
-docker compose ps
-
-# Stop all services
-docker compose down
-```
+Your current stack keeps working unchanged. To pick up future releases, follow [Upgrading](https://nocodb.com/docs/self-hosting/maintenance/upgrading). For migration help, contact [cs@nocodb.com](mailto:cs@nocodb.com).
